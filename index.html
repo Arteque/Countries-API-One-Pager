@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,600;6..12,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="app.css.map">
+    <link rel="stylesheet" href="app.css">
+    <title>Countries</title>
+</head>
+<body>
+    <div class="loader-container">
+        <div class="content">
+            <span class="loader"></span>
+            <h3>Download <span>.</span><span>.</span><span>.</span></h3>
+        </div>
+    </div>
+    <!--Main title-->
+    <h1 class="no-disp">
+        REST Countries API with color theme switcher
+    </h1>
+    <header id="main-header" class="shadow">
+        <div class="wrapper">
+            <div class="title-container">
+                <h2>Where in the world?</h2>
+            </div>
+            <div class="color-mode-container">
+                <button class="color-mode-btn">
+                    <span class="icon current">
+                        <i class="fa-solid fa-moon"></i>
+                    </span>
+                    <span class="icon">
+                        <i class="fa-solid fa-sun"></i>
+                    </span>
+                    <span class="text current">
+                        Dark Mode
+                    </span>
+                    <span class="text">
+                        Light Mode
+                    </span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <article>
+            <div class="wrapper">
+                <!--Header-->
+                <header>
+                    <form action="" id="search-form" class="shadow">
+                        <div class="search-container">
+                            <label for="search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </label>
+                            <input type="text" placeholder="Search for a country...">
+                        </div>
+                    </form>
+                    <!--Filter-->
+                    <form action="" id="filter-countries">
+                        <select name="" id="">
+                            <option value="0">Filter by Region</option>
+                            <option value="africa">Africa</option>
+                            <option value="americas">Americas</option>
+                            <option value="asia">Asia</option>
+                            <option value="europe">Europe</option>
+                            <option value="oceania">Oceania</option>
+                        </select>
+                    </form>
+                </header>
+                
+                
+
+                <!--Section-->
+                <section id="main-data" data-region="0">
+                    <!--JS Inject Data-->
+                </section>
+            </div>
+        </article>
+    </main>
+    <script async src="app.js"></script>
+    <script>
+        //Loader
+        const loaderContainer = document.querySelector(".loader-container")
+        
+        document.onreadystatechange = () => {
+            if(document.readyState == "complete"){
+                loaderContainer.classList.add("hide")
+            }
+        }
+        
+        const clrModeBtn = document.querySelector(".color-mode-container .color-mode-btn")
+        const clrModeBtnTxt = clrModeBtn.querySelectorAll(".text")
+        const clrModeBtnIcon = clrModeBtn.querySelectorAll(".icon")
+        const body = document.body
+        // darkmode check    
+        if(checkifDarkmodeExist()){
+            body.classList.add("darkmode")
+        }
+
+        // Toggle Darkmode on Click
+        clrModeBtn.addEventListener("click", (e) => {
+        e.preventDefault()
+        
+        clrModeBtnTxt.forEach(item => {
+            item.classList.toggle("current")
+        })
+        
+        clrModeBtnIcon.forEach(item => {
+            item.classList.toggle("current")
+        })
+        body.classList.toggle("darkmode")
+
+        const bodyClass = body.classList.value
+
+        if(bodyClass == "darkmode"){
+            if(!checkifDarkmodeExist()){
+                setDarkmodeasCookie()
+            }
+        }else{
+            if(checkifDarkmodeExist()){
+                removeDarkmodeCookie()
+            }
+        }
+
+       })
+
+       
+       // check if Darkmode is set in cookies
+       function checkifDarkmodeExist(){
+            let c = document.cookie
+            if(!c.includes("darkmode")) return
+            return true
+       }
+       // Store Darkmode as cookie
+       function setDarkmodeasCookie(){
+        let d = new Date()
+        d.setTime(d.getTime() + (366*24*60*60*1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = "darkmode = true;"+expires+";path=/";
+    }
+
+       // Remove Darkmode cookie
+       function removeDarkmodeCookie(){
+        let d = new Date()
+        d.setTime(d.getTime() - (366*24*60*60*1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = "darkmode = true;"+expires+";path=/";
+       }
+
+       function toggleClrMode(check){
+            if(!check) return
+       }
+
+       function toggleClasses(){
+            document.body.classList.toggle("darkmode")
+            
+            clrModeBtnTxt.forEach(item => {
+            item.classList.toggle("current")
+            })
+        
+            clrModeBtnIcon.forEach(item => {
+                item.classList.toggle("current")
+            })
+       }
+       
+    </script>
+</body>
+</html>
