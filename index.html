@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,600;6..12,800&display=swap" rel="stylesheet">
@@ -81,6 +82,40 @@
             </div>
         </article>
     </main>
+    <!--Attribution-->
+    <div class="attribution">
+        Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>
+        Coded by <a href="https://artecke.de" target="_blank" title="My art corner /  Portfolio and Website">Ahmed Lemssiah</a>
+        <ul>
+            <li>
+                <a href="https://github.com/Arteque/" target="_blank" title="Some of my projects on Github">
+                    <i class="fab fa-github"></i>
+                </a>
+            </li>
+            <li>
+                <a href="https://twitter.com/ArteckeDesign" target="_blank" title="some of my thoughts on X/Twitter">
+                    <i class="fa-brands fa-x-twitter"></i>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.youtube.com/channel/UCjzbCFOWdsdV6gxa5ho7EtQ" target="_blank" title="Some of my videos on Youtube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.instagram.com/artt3k/" target="_blank" title="Some of my drawings on instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </li>          
+            <li>
+                <a href="https://www.facebook.com/DieArtEcke" target="_blank" title="My sharings on Facebook">
+                    <i class="fab fa-facebook"></i>
+                </a>
+            </li>
+            
+
+        </ul>
+    </div>
     <script async src="app.js"></script>
     <script>
         //Loader
@@ -89,6 +124,7 @@
         document.onreadystatechange = () => {
             if(document.readyState == "complete"){
                 loaderContainer.classList.add("hide")
+                
             }
         }
         
@@ -96,13 +132,16 @@
         const clrModeBtnTxt = clrModeBtn.querySelectorAll(".text")
         const clrModeBtnIcon = clrModeBtn.querySelectorAll(".icon")
         const body = document.body
-        // darkmode check    
-        if(checkifDarkmodeExist()){
+        // darkmode check 
+       
+
+        if(checkDarkmodeExist() == "darkmode"){
             body.classList.add("darkmode")
         }
 
         // Toggle Darkmode on Click
         clrModeBtn.addEventListener("click", (e) => {
+
         e.preventDefault()
         
         clrModeBtnTxt.forEach(item => {
@@ -112,61 +151,41 @@
         clrModeBtnIcon.forEach(item => {
             item.classList.toggle("current")
         })
+       
         body.classList.toggle("darkmode")
 
-        const bodyClass = body.classList.value
-
-        if(bodyClass == "darkmode"){
-            if(!checkifDarkmodeExist()){
-                setDarkmodeasCookie()
-            }
-        }else{
-            if(checkifDarkmodeExist()){
-                removeDarkmodeCookie()
-            }
-        }
+        checkBodyforDarkmodeClassName()
 
        })
-
-       
-       // check if Darkmode is set in cookies
-       function checkifDarkmodeExist(){
-            let c = document.cookie
-            if(!c.includes("darkmode")) return
-            return true
-       }
-       // Store Darkmode as cookie
-       function setDarkmodeasCookie(){
-        let d = new Date()
-        d.setTime(d.getTime() + (366*24*60*60*1000));
-        let expires = "expires=" + d.toUTCString();
-        document.cookie = "darkmode = true;"+expires+";path=/";
-    }
-
-       // Remove Darkmode cookie
-       function removeDarkmodeCookie(){
-        let d = new Date()
-        d.setTime(d.getTime() - (366*24*60*60*1000));
-        let expires = "expires=" + d.toUTCString();
-        document.cookie = "darkmode = true;"+expires+";path=/";
+       //check body class if darkmode exist
+       function checkBodyforDarkmodeClassName(){
+        console.log(body.className)
+        if(!body.className.includes("darkmode") && checkDarkmodeExist()){
+            removeDarkmodefromLocalStorage()
+        }else if(body.className.includes("darkmode") && !checkDarkmodeExist()){
+            setupDarkmodeinLocalStorage()
+        }
        }
 
-       function toggleClrMode(check){
-            if(!check) return
+       // Set darkmode in the localstorage
+
+       function setupDarkmodeinLocalStorage(){
+            localStorage.setItem("theme-mode", "darkmode")
        }
 
-       function toggleClasses(){
-            document.body.classList.toggle("darkmode")
-            
-            clrModeBtnTxt.forEach(item => {
-            item.classList.toggle("current")
-            })
+
+       // check if the darkmode exist
+       function checkDarkmodeExist(){
+        if(localStorage.getItem("theme-mode")) return "darkmode"
         
-            clrModeBtnIcon.forEach(item => {
-                item.classList.toggle("current")
-            })
        }
-       
+
+         //    remove the darkmode mode
+       function removeDarkmodefromLocalStorage(){
+        //check if darkmodeexist
+        checkDarkmodeExist() && localStorage.removeItem("theme-mode")
+       }
+
     </script>
 </body>
 </html>

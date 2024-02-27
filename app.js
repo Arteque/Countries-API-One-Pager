@@ -111,8 +111,11 @@ function singleTemplate(country){
 }
 let dataArr = []
 function getCountriesBorderFullName(elements){
-    
-    if(!elements) return
+    console.log(elements)
+    if(elements == undefined){
+        dataArr.push({"name": "No neighboring countries due to the geographic location!", "index": "none"})
+        return
+    }
     elements.forEach(border => {
         countriesArr.forEach(element => {
             if(element.alphaCode == border){
@@ -122,10 +125,11 @@ function getCountriesBorderFullName(elements){
     })
 }
 function bordersTemplate(el){
-    return `<span class="bordered" data-index="${el.index}" onclick="changeIndex(${el.index})">${el.name}</span>`
+    return `<span class="bordered ${el.index}" data-index="${el.index}" onclick="changeIndex(${el.index})">${el.name}</span>`
 }
 
 function changeIndex(index){
+    if(index == "none") return 
     window.location.href = baseUrl+"?country="+index
 }
 
@@ -139,7 +143,6 @@ function getCountryLangues(language){
 
 function detailsTemplate(country){
     getCountriesBorderFullName(country.bordercountries)
-    console.log(country)
     return `
         <section id="details-section" data-name="${country.name}" data-index="${country.index}">
             <header class="back-container">
