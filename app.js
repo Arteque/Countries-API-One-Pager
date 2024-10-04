@@ -101,13 +101,57 @@ function getMoreDataWiki(stateName,DomContainer){
         if(page && page.extract){
             const container = await document.querySelector(DomContainer)
             container.innerText = page.extract
+            const audioUrl = await getNationalAnthem(stateName)
+            
+            document.querySelector("#audio-anthem-player").innerHTML = `
+                <source src="https://commons.wikimedia.org/wiki/Special:FilePath/${audioUrl}" type="audio/ogg">
+            `
+            document.querySelector("#audio-anthem-player-container").cssText =  `
+                display:flex !important;
+                align-items:center;
+                gap:10px;
+            ` 
         }
+
     })
     .catch(err => console.log(err))
-   
 }
 
 
+async function getNationalAnthem(countryName){
+    const formattedCountryName = countryName.replace(/ /g, "_")
+    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&titles=${formattedCountryName}&prop=extracts|pageimages|revisions&rvprop=content&rvslots=main`
+    // console.log(formattedCountryName)
+    try{
+        const response = await fetch(url)
+        const data = await response.json()
+        const pages = data.query.pages
+        const page = Object.values(pages)[0]
+        console.log(page.revisions[0].slots.main)
+
+        //
+        if(page && page.revisions[0].slots.main){
+            const anthemFile = extractAnthem(page.revisions[0].slots.main["*"])
+            if(anthemFile){
+                return String(anthemFile)
+            }else{
+                console.error('Notional Anthem not found')
+            }
+        }
+    } catch (err) {
+        console.log(err)
+    }
+    
+}
+
+function extractAnthem(extract) {
+    const regex = /\[\[File:(.+?)\]\]/
+    const match = extract.match(regex)
+    // console.log(match)
+    const refineMatch = match[0].replace(/\[\[File:(.+?)\]\]}?/, '$1').replace(/ /g, "_");
+    
+    return refineMatch ? refineMatch : null
+}
 
 
 
@@ -192,6 +236,12 @@ function detailsTemplate(country){
             <div class="card-container details">
                 <div class="card-header">
                     <img src="${country.flag}" alt="${country.name}">
+                    <div id="audio-anthem-player-container">
+                        <span>Nationalanthem:</span>
+                        <audio controls id="audio-anthem-player" >
+                            
+                        </audio>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h2 class="full-width">${country.name}</h2>
