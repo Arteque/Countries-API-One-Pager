@@ -9,10 +9,12 @@ const baseUrl = window.location.origin+window.location.pathname
 fetch("data.json")
 .then(data => data.json())
 .then(data => {
+    // console.log(data)
     data.forEach((country,index) => {
         countriesArr.push({
             "index": index,
             "alphaCode":country.alpha3Code,
+            "alphaCode2":country.alpha2Code,
             "name":country.name,
             "region":country.region,
             "population":country.population,
@@ -69,12 +71,11 @@ const cardsDOM = [...document.querySelectorAll(".card-container")]
 })
 .then(() => {
     analyseWindowLocation()
+    
 })
 
 
-
-
-function analyseWindowLocation(){
+async function analyseWindowLocation(){
     if(!window.location.href.includes("?country")) return
     // we can split the data using && if we knew that there is more attributes
     const country = Number(window.location.href.split("?country=")[1].trim())
@@ -82,13 +83,42 @@ function analyseWindowLocation(){
     cardContainerParent.classList.add("no-disp")
     filterCountries.parentElement.parentElement.classList.add("no-disp")
     cardContainerParent.parentElement.innerHTML += detailsTemplate(countriesArr[country])
-
+    
+    getMoreDataWiki(countriesArr[country].name, "#country-data-text");
 }
+
+
+
+function getMoreDataWiki(stateName,DomContainer){
+    const formattedCountryName = stateName.replace(/ /g, "_");
+    const url =  `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=extracts&exintro=&explaintext=&titles=${formattedCountryName}`
+    fetch(url)
+    .then(response => response.json())
+    .then(async data => {
+        const pages = data.query.pages;
+        const page = Object.values(pages)[0];
+        
+        if(page && page.extract){
+            const container = await document.querySelector(DomContainer)
+            container.innerText = page.extract
+        }
+    })
+    .catch(err => console.log(err))
+   
+}
+
+
+
 
 
 function singleTemplate(country){
     return `
-        <div class="card-container" data-filter="${country.region.toLowerCase()}" data-index="${country.alphaCode}" data-name="${country.name.toLowerCase().trim()}">
+        <div class="card-container" 
+        data-filter="${country.region.toLowerCase()}" 
+        data-index="${country.alphaCode}" 
+        data-name="${country.name.toLowerCase().trim()}"
+        data-iso2=${country.alphaCode2}
+        >
             <div class="card-header">
                 <img loading="lazy" src="${country.flag}" alt="${country.name}s flag">
             </div>
@@ -111,7 +141,7 @@ function singleTemplate(country){
 }
 let dataArr = []
 function getCountriesBorderFullName(elements){
-    console.log(elements)
+    // console.log(elements)
     if(elements == undefined){
         dataArr.push({"name": "No neighboring countries due to the geographic location!", "index": "none"})
         return
@@ -144,7 +174,11 @@ function getCountryLangues(language){
 function detailsTemplate(country){
     getCountriesBorderFullName(country.bordercountries)
     return `
-        <section id="details-section" data-name="${country.name}" data-index="${country.index}">
+        <section id="details-section" 
+        data-name="${country.name}" 
+        data-index="${country.index}"
+        data-iso2=${country.alphaCode2}
+        >
             <header class="back-container">
                 <button class="bordered" onclick="backToHome()">
                     <span class="icon">
@@ -189,7 +223,7 @@ function detailsTemplate(country){
                             <b>Languages:</b> ${country.languages.map(getCountryLangues).join(", ")}
                         </li>
                     </ul>
-
+                    <p id="country-data-text"></p>
                     <ul class="full-width">
                         <li class="flex row wrap gap"> 
                             <b>Border Countries:</b>${dataArr.map(bordersTemplate).join(" ")}
@@ -217,5 +251,7 @@ function detailsTemplate(country){
             })
         }
     })
+
+
 
 
