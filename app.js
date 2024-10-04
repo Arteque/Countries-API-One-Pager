@@ -158,18 +158,20 @@ function extractAnthem(extract) {
 
 // Get the lat and lon for the leaflet map
 async function getTheCountryCoord(country){
-    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=coordinates&titles=${encodeURI(country)}&colimit=1`
+    formattedCountryName = country.replace(/ /g, "_").trim().toLowerCase()
+    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=coordinates&titles=${formattedCountryName}&colimit=1`
     try{
         const response = await fetch(url)
         const data = await response.json()
         const pages = data.query.pages
+        console.log(data)
         const pageId = Object.values(pages)[0]
+        // if(!pageId.coordinates[0].lat || !pageId.coordinates[0].long) return null
 
         const coordData = {
             lat: pageId.coordinates[0].lat,
             lon: pageId.coordinates[0].lon
         }
-        console.log(coordData) 
 
         showCountryOnTheMap(coordData.lat, coordData.lon)
 
@@ -182,7 +184,7 @@ function showCountryOnTheMap(lat,long){
 
     var map = L.map('map').setView([lat, long], 13);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 4,
+        maxZoom: 6,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 }

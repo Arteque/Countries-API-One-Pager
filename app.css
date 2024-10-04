@@ -205,10 +205,14 @@ div#audio-anthem-player-container{
 div#audio-anthem-player-container:has(> audio > source[src$=".ogg"]) {
   opacity: 1;
 }
-#map{
-  height: 400px !important;
+
+#map.leaflet-container{
+  height: 400px;
   grid-column: 1 / span 2;
   grid-row: 2;
+}
+#map:not(.leaflet-container ){
+  display: none;
 }
 .card-container.details .card-body {
   padding: 3rem 0rem;
