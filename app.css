@@ -191,6 +191,25 @@ html, body, select, input, option {
           filter: saturate(2);
   scale: 1.01;
 }
+div#audio-anthem-player-container {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  justify-content: flex-start;
+  align-items: center;
+  margin-block: 1rem;
+}
+div#audio-anthem-player-container{
+  opacity: 0;
+}
+div#audio-anthem-player-container:has(> audio > source[src$=".ogg"]) {
+  opacity: 1;
+}
+#map{
+  height: 400px !important;
+  grid-column: 1 / span 2;
+  grid-row: 2;
+}
 .card-container.details .card-body {
   padding: 3rem 0rem;
 }
@@ -198,9 +217,24 @@ html, body, select, input, option {
   font-weight:600;
   overflow-x: hidden;
   overflow-y: auto;
-  height: 200px;
-  padding: 1rem 2rem 2rem 2rem;
+  height: 400px;
+  padding: 0;
   border-block: 1px solid #999;
+}
+.card-container.details #country-data-text h3{
+  font-size: 2rem;
+  color: var(--clr);
+}
+.card-container.details #country-data-text p{
+  font-size: 1.25rem;
+  font-weight: 300;
+  letter-spacing: 1px;
+  line-height: 2.5rem;
+}
+@media screen and ( min-width: 1024px ){
+  .card-container.details #country-data-text{
+    padding: 1rem 2rem 2rem 2rem;
+  }
 }
 .card-container .card-header {
   aspect-ratio: 4/2;

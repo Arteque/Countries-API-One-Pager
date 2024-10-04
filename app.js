@@ -85,9 +85,11 @@ async function analyseWindowLocation(){
     cardContainerParent.parentElement.innerHTML += detailsTemplate(countriesArr[country])
     
     getMoreDataWiki(countriesArr[country].name, "#country-data-text");
+    getTheCountryCoord(countriesArr[country].name)
+    //showCountryOnTheMap()
 }
 
-
+//Get the choosen country national anthems if available 
 
 function getMoreDataWiki(stateName,DomContainer){
     const formattedCountryName = stateName.replace(/ /g, "_");
@@ -100,17 +102,16 @@ function getMoreDataWiki(stateName,DomContainer){
         
         if(page && page.extract){
             const container = await document.querySelector(DomContainer)
-            container.innerText = page.extract
+            container.innerHTML = `
+                <h3>Description</h3>
+               <p> ${page.extract}  </p>
+            `
             const audioUrl = await getNationalAnthem(stateName)
             
             document.querySelector("#audio-anthem-player").innerHTML = `
                 <source src="https://commons.wikimedia.org/wiki/Special:FilePath/${audioUrl}" type="audio/ogg">
             `
-            document.querySelector("#audio-anthem-player-container").cssText =  `
-                display:flex !important;
-                align-items:center;
-                gap:10px;
-            ` 
+           
         }
 
     })
@@ -155,6 +156,38 @@ function extractAnthem(extract) {
 
 
 
+// Get the lat and lon for the leaflet map
+async function getTheCountryCoord(country){
+    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=coordinates&titles=${encodeURI(country)}&colimit=1`
+    try{
+        const response = await fetch(url)
+        const data = await response.json()
+        const pages = data.query.pages
+        const pageId = Object.values(pages)[0]
+
+        const coordData = {
+            lat: pageId.coordinates[0].lat,
+            lon: pageId.coordinates[0].lon
+        }
+        console.log(coordData) 
+
+        showCountryOnTheMap(coordData.lat, coordData.lon)
+
+    }catch(err){
+        console.log(err)
+    }
+}
+
+function showCountryOnTheMap(lat,long){
+
+    var map = L.map('map').setView([lat, long], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 4,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+}
+
+
 function singleTemplate(country){
     return `
         <div class="card-container" 
@@ -183,6 +216,9 @@ function singleTemplate(country){
         </div>
     `
 }
+
+
+
 let dataArr = []
 function getCountriesBorderFullName(elements){
     // console.log(elements)
@@ -242,9 +278,11 @@ function detailsTemplate(country){
                             
                         </audio>
                     </div>
+                  
                 </div>
                 <div class="card-body">
                     <h2 class="full-width">${country.name}</h2>
+                    <div class="country-data-map" id="map"></div>
                     <ul>
                         <li>
                             <b>Native Name:</b> ${country.nativename}
@@ -273,7 +311,8 @@ function detailsTemplate(country){
                             <b>Languages:</b> ${country.languages.map(getCountryLangues).join(", ")}
                         </li>
                     </ul>
-                    <p id="country-data-text"></p>
+                    <div id="country-data-text"></div>
+                    
                     <ul class="full-width">
                         <li class="flex row wrap gap"> 
                             <b>Border Countries:</b>${dataArr.map(bordersTemplate).join(" ")}
